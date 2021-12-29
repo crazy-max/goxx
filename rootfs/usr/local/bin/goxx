@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+
+: "${TARGETPLATFORM=}"
+: "${TARGETOS=}"
+: "${TARGETARCH=}"
+: "${TARGETVARIANT=}"
+: "${CGO_ENABLED=}"
+: "${GOARCH=}"
+: "${GOOS=}"
+: "${GOARM=}"
+: "${GOBIN=}"
+
+set -e
+
+if [ -n "$TARGETPLATFORM" ]; then
+  os="$(echo $TARGETPLATFORM | cut -d"/" -f1)"
+  arch="$(echo $TARGETPLATFORM | cut -d"/" -f2)"
+  if [ -n "$os" ] && [ -n "$arch" ]; then
+    export GOOS="$os"
+    export GOARCH="$arch"
+    if [ "$arch" = "arm" ]; then
+      case "$(echo $TARGETPLATFORM | cut -d"/" -f3)" in
+      "v5")
+        export GOARM="5"
+        ;;
+      "v6")
+        export GOARM="6"
+        ;;
+      *)
+        export GOARM="7"
+        ;;
+      esac
+    fi
+  fi
+fi
+
+if [ -n "$TARGETOS" ]; then
+  export GOOS="$TARGETOS"
+fi
+
+if [ -n "$TARGETARCH" ]; then
+  export GOARCH="$TARGETARCH"
+fi
+
+if [ "$TARGETARCH" = "arm" ]; then
+  if [ -n "$TARGETVARIANT" ]; then
+    case "$TARGETVARIANT" in
+    "v5")
+      export GOARM="5"
+      ;;
+    "v6")
+      export GOARM="6"
+      ;;
+    *)
+      export GOARM="7"
+      ;;
+    esac
+  else
+    export GOARM="7"
+  fi
+fi
+
+if [ "$GOOS" = "wasi" ]; then
+  export GOOS="js"
+fi
+
+if [ "$CGO_ENABLED" = "1" ]; then
+  case "$GOARCH" in
+  "386")
+    export AR="i686-linux-gnu-ar"
+    export CC="i686-linux-gnu-gcc"
+    export CXX="i686-linux-gnu-g++"
+    if [ "$GOOS" = "windows" ]; then
+      export AR="i686-w64-mingw32-ar"
+      export CC="i686-w64-mingw32-gcc"
+      export CXX="i686-w64-mingw32-g++"
+      export CGO_CFLAGS="-D_WIN32_WINNT=0x0400"
+      export CGO_CXXFLAGS="-D_WIN32_WINNT=0x0400"
+    fi
+    ;;
+  "amd64")
+    export AR="x86_64-linux-gnu-ar"
+    export CC="x86_64-linux-gnu-gcc"
+    export CXX="x86_64-linux-gnu-g++"
+    if [ "$GOOS" = "darwin" ]; then
+      export CC="o64-clang"
+      export CXX="o64-clang++"
+    elif [ "$GOOS" = "windows" ]; then
+      export AR="x86_64-w64-mingw32-ar"
+      export CC="x86_64-w64-mingw32-gcc"
+      export CXX="x86_64-w64-mingw32-g++"
+      export CGO_CFLAGS="-D_WIN32_WINNT=0x0400"
+      export CGO_CXXFLAGS="-D_WIN32_WINNT=0x0400"
+    fi
+    ;;
+  "arm")
+    case "$GOARM" in
+    "5")
+      export AR="arm-linux-gnueabi-ar"
+      export CC="arm-linux-gnueabi-gcc"
+      export CXX="arm-linux-gnueabi-g++"
+      export CGO_CFLAGS="-march=armv5t"
+      export CGO_CXXFLAGS="-march=armv5t"
+      ;;
+    "6")
+      export AR="arm-linux-gnueabi-ar"
+      export CC="arm-linux-gnueabi-gcc"
+      export CXX="arm-linux-gnueabi-g++"
+      export CGO_CFLAGS="-march=armv6"
+      export CGO_CXXFLAGS="-march=armv6"
+      ;;
+    "7")
+      export AR="arm-linux-gnueabihf-ar"
+      export CC="arm-linux-gnueabihf-gcc"
+      export CXX="arm-linux-gnueabihf-g++"
+      export CGO_CFLAGS="-march=armv7-a -fPIC"
+      export CGO_CXXFLAGS="-march=armv7-a -fPIC"
+      ;;
+    *)
+      export AR="arm-linux-gnueabihf-ar"
+      export CC="arm-linux-gnueabihf-gcc"
+      export CXX="arm-linux-gnueabihf-g++"
+      ;;
+    esac
+    ;;
+  "arm64")
+    export AR="aarch64-linux-gnu-ar"
+    export CC="aarch64-linux-gnu-gcc"
+    export CXX="aarch64-linux-gnu-g++"
+    if [ "$GOOS" = "darwin" ]; then
+      export CC="o64-clang"
+      export CXX="o64-clang++"
+    elif [ "$GOOS" = "windows" ]; then
+      export AR="aarch64-w64-mingw32-ar"
+      export CC="aarch64-w64-mingw32-gcc"
+      export CXX="aarch64-w64-mingw32-g++"
+      export CGO_CFLAGS="-D_WIN32_WINNT=0x0400"
+      export CGO_CXXFLAGS="-D_WIN32_WINNT=0x0400"
+    fi
+    ;;
+  "mips")
+    export AR="mips-linux-gnu-ar"
+    export CC="mips-linux-gnu-gcc"
+    export CXX="mips-linux-gnu-g++"
+    ;;
+  "mipsle")
+    export AR="mipsel-linux-gnu-ar"
+    export CC="mipsel-linux-gnu-gcc"
+    export CXX="mipsel-linux-gnu-g++"
+    ;;
+  "mips64")
+    export AR="mips64-linux-gnuabi64-ar"
+    export CC="mips64-linux-gnuabi64-gcc"
+    export CXX="mips64-linux-gnuabi64-g++"
+    ;;
+  "mips64le")
+    export AR="mips64el-linux-gnuabi64-ar"
+    export CC="mips64el-linux-gnuabi64-gcc"
+    export CXX="mips64el-linux-gnuabi64-g++"
+    ;;
+  "ppc64le")
+    export AR="powerpc64le-linux-gnu-ar"
+    export CC="powerpc64le-linux-gnu-gcc"
+    export CXX="powerpc64le-linux-gnu-g++"
+    ;;
+  "riscv64")
+    export AR="riscv64-linux-gnu-ar"
+    export CC="riscv64-linux-gnu-gcc"
+    export CXX="riscv64-linux-gnu-g++"
+    ;;
+  "s390x")
+    export AR="s390x-linux-gnu-ar"
+    export CC="s390x-linux-gnu-gcc"
+    export CXX="s390x-linux-gnu-g++"
+    ;;
+  esac
+fi
+
+if [ -z "$GOBIN" ] && [ -n "$GOPATH" ] && [ -n "$GOARCH" ] && [ -n "$GOOS" ]; then
+  export PATH=${GOPATH}/bin/${GOOS}_${GOARCH}:${PATH}
+fi
+
+exec go "$@"
