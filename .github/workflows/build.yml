@@ -6,7 +6,11 @@ on:
       - 'main'
     tags:
       - 'v*'
+    paths-ignore:
+      - '**.md'
   pull_request:
+    paths-ignore:
+      - '**.md'
 
 env:
   DOCKERHUB_SLUG: crazymax/goxx
