@@ -88,6 +88,9 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
+        name: Remove dotnet
+        run: sudo rm -rf /usr/share/dotnet
+      -
         name: Cache
         uses: actions/cache@v2
         with:
