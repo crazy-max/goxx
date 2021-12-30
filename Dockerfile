@@ -85,7 +85,7 @@ RUN patch -p1 < lcxx.patch \
 FROM base AS golang
 RUN apt-get update && apt-get install --no-install-recommends -y jq
 WORKDIR /golang
-RUN curl -sSL "https://go.dev/dl/?mode=json&include=all" -o "dist.json"
+RUN curl -m30 --retry 5 --retry-connrefused --retry-delay 5 -sSL "https://go.dev/dl/?mode=json&include=all" -o "dist.json"
 ARG GO_VERSION
 ARG TARGETOS
 ARG TARGETARCH
