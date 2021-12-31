@@ -18,6 +18,7 @@ ___
 * [Notes](#notes)
   * [Wrapper](#wrapper)
   * [CGO](#cgo)
+  * [Override MacOSX cross toolchain](#override-macosx-cross-toolchain)
 * [Contributing](#contributing)
 * [Lisence](#license)
 
@@ -80,18 +81,14 @@ many powerful build features. All builds executed via buildx run with
 [Moby BuildKit](https://github.com/moby/buildkit) builder engine.
 
 ```dockerfile
-# syntax=docker/dockerfile:1.3
+# syntax=docker/dockerfile:1
 
 FROM --platform=$BUILDPLATFORM crazymax/goxx:1.17 AS base
+ENV GO111MODULE=auto
 ENV CGO_ENABLED=1
-WORKDIR /src
+WORKDIR /go/src/hello
 
-FROM base AS vendored
-RUN --mount=type=bind,target=.,rw \
-  --mount=type=cache,target=/go/pkg/mod \
-  go mod tidy && go mod download
-
-FROM vendored AS build
+FROM base AS build
 ARG TARGETPLATFORM
 RUN --mount=type=bind,source=. \
   --mount=type=cache,target=/root/.cache \
@@ -189,6 +186,29 @@ By default, CGO is enabled in Go when compiling for native architecture and
 disabled when cross-compiling. It's therefore recommended to always set
 `CGO_ENABLED=0` or `CGO_ENABLED=1` when cross-compiling depending on whether
 you need to use CGO or not.
+
+### Override MacOSX cross toolchain
+
+You can also use another version of the MacOSX cross toolchain provided by
+[`crazymax/osxcross`](https://github.com/crazy-max/docker-osxcross) image:
+
+```dockerfile
+# syntax=docker/dockerfile:1
+
+FROM --platform=$BUILDPLATFORM crazymax/osxcross:10.13 AS osxcross
+FROM --platform=$BUILDPLATFORM crazymax/goxx:1.17 AS base
+ENV GO111MODULE=auto
+ENV CGO_ENABLED=1
+WORKDIR /go/src/hello
+
+FROM base AS build
+ARG TARGETPLATFORM
+RUN --mount=type=bind,source=. \
+  --mount=from=osxcross,target=/osxcross,src=/osxcross,rw \
+  --mount=type=cache,target=/root/.cache \
+  --mount=type=cache,target=/go/pkg/mod \
+  goxx build -o /out/hello ./hello.go
+```
 
 ## Contributing
 
