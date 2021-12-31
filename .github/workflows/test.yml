@@ -17,8 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         go_version:
-          - 1.17
-          - 1.16
+          - 1.17.5
+          - 1.16.12
         example:
           - c
           - cpp
@@ -41,7 +41,7 @@ jobs:
         name: Build goxx
         uses: docker/bake-action@v1
         with:
-          targets: go-${{ matrix.go_version }}
+          targets: image
           set: |
             *.tags=localhost:5000/goxx:${{ matrix.go_version }}
           push: true
