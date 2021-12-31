@@ -93,6 +93,4 @@ ENV GO_VERSION=${GO_VERSION}
 ENV PATH="$GOPATH/bin:/usr/local/go/bin:/osxcross/bin:$PATH"
 ENV LD_LIBRARY_PATH="/osxcross/lib:$LD_LIBRARY_PATH"
 COPY rootfs /
-
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
-RUN goxx-bootstrap
