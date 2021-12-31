@@ -10,6 +10,7 @@
 ___
 
 * [About](#about)
+* [Projects using goxx](#projects-using-goxx)
 * [Docker image](#docker-image)
 * [Platforms available](#platforms-available)
 * [Usage](#usage)
@@ -27,6 +28,11 @@ base for building your Go project using CGO. All the necessary Go tool-chains,
 C/C++ cross-compilers and platform headers/libraries have been assembled into
 a single Docker container. It also includes the MinGW compiler for windows,
 and the MacOSX SDK.
+
+## Projects using goxx
+
+* [goreleaser-xx](https://github.com/crazy-max/goreleaser-xx)
+* [xgo](https://github.com/crazy-max/xgo)
 
 ## Docker image
 
