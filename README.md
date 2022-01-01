@@ -12,7 +12,7 @@ ___
 * [About](#about)
 * [Projects using goxx](#projects-using-goxx)
 * [Docker image](#docker-image)
-* [Platforms available](#platforms-available)
+* [Supported platforms](#supported-platforms)
 * [Usage](#usage)
 * [Build](#build)
 * [Notes](#notes)
@@ -51,7 +51,7 @@ Image: crazymax/goxx:latest
    - linux/arm64
 ```
 
-## Platforms available
+## Supported platforms
 
 | Platform             | `CC`                           | `CXX`                          |
 |----------------------|--------------------------------|--------------------------------|
