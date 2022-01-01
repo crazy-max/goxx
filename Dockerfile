@@ -17,29 +17,12 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     bash \
     bc \
     binutils-multiarch \
-    build-essential \
     bzr \
     ca-certificates \
     clang \
     cmake \
-    crossbuild-essential-amd64 \
-    crossbuild-essential-arm64 \
-    crossbuild-essential-armel \
-    crossbuild-essential-armhf \
-    crossbuild-essential-i386 \
-    crossbuild-essential-mips \
-    crossbuild-essential-mipsel \
-    crossbuild-essential-mips64 \
-    crossbuild-essential-mips64el \
-    crossbuild-essential-ppc64el \
-    crossbuild-essential-riscv64 \
-    crossbuild-essential-s390x \
     curl \
     devscripts \
-    g++ \
-    gcc \
-    g++-mingw-w64 \
-    gcc-mingw-w64 \
     gdb \
     git \
     libssl-dev \

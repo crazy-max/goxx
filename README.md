@@ -16,7 +16,7 @@ ___
 * [Usage](#usage)
 * [Build](#build)
 * [Notes](#notes)
-  * [Wrapper](#wrapper)
+  * [Wrappers](#wrappers)
   * [CGO](#cgo)
   * [Override MacOSX cross toolchain](#override-macosx-cross-toolchain)
 * [Contributing](#contributing)
@@ -26,9 +26,9 @@ ___
 
 This repo contains a Dockerfile for building an image which can be used as a
 base for building your Go project using CGO. All the necessary Go tool-chains,
-C/C++ cross-compilers and platform headers/libraries have been assembled into
-a single Docker container. It also includes the MinGW compiler for windows,
-and the MacOSX SDK.
+C/C++ cross-compilers and platform headers/libraries can be installed with the
+specially crafted [wrappers](#wrappers). This project is heavily inspired by
+[`xx` project](https://github.com/tonistiigi/xx/).
 
 ## Projects using goxx
 
@@ -90,10 +90,11 @@ WORKDIR /go/src/hello
 
 FROM base AS build
 ARG TARGETPLATFORM
+RUN goxx-apt-get install -y binutils gcc g++ pkg-config
 RUN --mount=type=bind,source=. \
   --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/go/pkg/mod \
-  goxx build -o /out/hello ./hello.go
+  goxx-go build -o /out/hello ./hello.go
 
 FROM scratch AS artifact
 COPY --from=build /out /
@@ -173,12 +174,17 @@ export GOXX_BASE=localhost:5000/goxx:latest
 
 ## Notes
 
-### Wrapper
+### Wrappers
 
-[`goxx`](rootfs/usr/local/bin/goxx) is a simple wrapper for `go` which will
-automatically sets values for `GOOS`, `GOARCH`, `GOARM`, `GOMIPS`, etc. but also
-`AR`, `CC`, `CXX` if building with CGO based on defined [ARGs in the global scope](https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope)
+Wrappers are a significant part of this repo to dynamically handle the build
+process with a `go` wrapper named [`goxx-go`](rootfs/usr/local/bin/goxx-go) which
+will automatically sets values for `GOOS`, `GOARCH`, `GOARM`, `GOMIPS`, etc. but
+also `AR`, `CC`, `CXX` if building with CGO based on defined [ARGs in the global scope](https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope)
 like `TARGETPLATFORM`.
+
+It also manages debian packages for cross-compiling for non-native architectures with
+[`goxx-apt-get`](rootfs/usr/local/bin/goxx-apt-get) and [`goxx-macports`](rootfs/usr/local/bin/goxx-macports)
+to install MacPorts packages.
 
 ### CGO
 
@@ -203,11 +209,12 @@ WORKDIR /go/src/hello
 
 FROM base AS build
 ARG TARGETPLATFORM
+RUN goxx-apt-get install -y binutils gcc g++ pkg-config
 RUN --mount=type=bind,source=. \
   --mount=from=osxcross,target=/osxcross,src=/osxcross,rw \
   --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/go/pkg/mod \
-  goxx build -o /out/hello ./hello.go
+  goxx-go build -o /out/hello ./hello.go
 ```
 
 ## Contributing
