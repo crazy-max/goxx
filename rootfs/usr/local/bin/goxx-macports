@@ -13,7 +13,7 @@ fi
 if [ -z "$MACOSX_DEPLOYMENT_TARGET" ]; then
   export MACOSX_DEPLOYMENT_TARGET=10.10
   if [ "${GOARCH}" = "arm64" ]; then
-    export MACOSX_DEPLOYMENT_TARGET=11.3
+    export MACOSX_DEPLOYMENT_TARGET=11.2
   fi
 fi
 

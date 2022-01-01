@@ -140,6 +140,7 @@ case "$GOARCH" in
       CC="x86_64-linux-gnu-gcc"
       CXX="x86_64-linux-gnu-g++"
       if [ "$GOOS" = "darwin" ]; then
+        AR=""
         CC="o64-clang"
         CXX="o64-clang++"
       elif [ "$GOOS" = "windows" ]; then
@@ -210,6 +211,7 @@ case "$GOARCH" in
       CC="aarch64-linux-gnu-gcc"
       CXX="aarch64-linux-gnu-g++"
       if [ "$GOOS" = "darwin" ]; then
+        AR=""
         CC="o64-clang"
         CXX="o64-clang++"
       elif [ "$GOOS" = "windows" ]; then
