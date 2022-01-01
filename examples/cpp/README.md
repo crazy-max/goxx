@@ -1,5 +1,5 @@
 ```shell
-# build docker image and output to docker with cpp-xgo:local tag (default)
+# build docker image and output to docker with cpp-xx:local tag (default)
 docker buildx bake image-local
 
 # build multi-platform image
