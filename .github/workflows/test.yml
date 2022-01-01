@@ -23,6 +23,7 @@ jobs:
           - c
           - cpp
           - gorm
+          - jq
     services:
       registry:
         image: registry:2
