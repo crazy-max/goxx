@@ -4,10 +4,7 @@ ARG UBUNTU_VERSION="21.04"
 ARG OSXCROSS_VERSION="11.3"
 ARG GO_VERSION="1.17.5"
 
-FROM --platform=$BUILDPLATFORM alpine AS godist
-RUN apk --update --no-cache add ca-certificates curl
-RUN curl -m30 --retry 5 --retry-connrefused --retry-delay 5 -sSL "https://go.dev/dl/?mode=json&include=all" -o "/godist.json"
-
+FROM crazymax/osxcross:${OSXCROSS_VERSION} AS osxcross
 FROM ubuntu:${UBUNTU_VERSION} AS base
 RUN export DEBIAN_FRONTEND="noninteractive" \
   && apt-get update \
@@ -16,7 +13,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     automake \
     bash \
     bc \
-    binutils-multiarch \
+    binutils \
     bzr \
     ca-certificates \
     clang \
@@ -24,34 +21,29 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     curl \
     devscripts \
     gdb \
-    git \
     libssl-dev \
     libtool \
     llvm \
     lzma \
     make \
-    mercurial \
     multistrap \
-    pkg-config \
     swig \
     texinfo \
     tzdata \
     uuid \
-    zip \
   && apt-get -y autoremove \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && ln -sf /usr/include/asm-generic /usr/include/asm
 
 FROM base AS golang
-RUN apt-get update && apt-get install --no-install-recommends -y jq
+RUN export DEBIAN_FRONTEND="noninteractive" && apt-get update && apt-get install --no-install-recommends -y jq
 WORKDIR /golang
-COPY --from=godist /godist.json .
+RUN curl -m30 --retry 5 --retry-connrefused --retry-delay 5 -sSL "https://go.dev/dl/?mode=json&include=all" -o "godist.json"
 ARG GO_VERSION
 ARG TARGETOS
 ARG TARGETARCH
-ENV GOPATH="/go"
-ENV PATH="$GOPATH/bin:/usr/local/go/bin:$PATH"
+ENV PATH="/usr/local/go/bin:$PATH"
 RUN <<EOT
 GO_DIST_FILE=go${GO_VERSION%.0}.${TARGETOS}-${TARGETARCH}.tar.gz
 GO_DIST_URL=https://golang.org/dl/${GO_DIST_FILE}
@@ -63,7 +55,6 @@ tar -C /usr/local -xzf go.tgz
 go version
 EOT
 
-FROM crazymax/osxcross:${OSXCROSS_VERSION} AS osxcross
 FROM base
 COPY --from=osxcross /osxcross /osxcross
 COPY --from=golang /usr/local/go /usr/local/go
