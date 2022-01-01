@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -e
+
+source goxx-env
+
+export GOARCH=$GOARCH
+export GOOS=$GOOS
+export GOARM=$GOARM
+export GOBIN=$GOBIN
+export AR=$AR
+export CC=$CC
+export CXX=$CXX
+export CGO_CFLAGS=$CGO_CFLAGS
+export CGO_CXXFLAGS=$CGO_CXXFLAGS
+
+if [ -z "$GOBIN" ] && [ -n "$GOPATH" ] && [ -n "$GOARCH" ] && [ -n "$GOOS" ]; then
+  export PATH=${GOPATH}/bin/${GOOS}_${GOARCH}:${PATH}
+fi
+
+exec go "$@"

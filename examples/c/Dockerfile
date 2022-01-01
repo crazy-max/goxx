@@ -9,9 +9,10 @@ WORKDIR /go/src/github.com/crazy-max/goxx/examples/c
 
 FROM base AS build
 ARG TARGETPLATFORM
+RUN goxx-apt-get install -y binutils gcc g++ pkg-config
 RUN --mount=type=bind,source=. \
   --mount=type=cache,target=/root/.cache \
-  goxx env && goxx build -o /out/c-xx .
+  goxx-go env && goxx-go build -o /out/c-xx .
 
 FROM scratch AS artifact
 COPY --from=build /out /

@@ -1,0 +1,287 @@
+#!/usr/bin/env bash
+
+: "${TARGETPLATFORM=}"
+: "${TARGETOS=}"
+: "${TARGETARCH=}"
+: "${TARGETVARIANT=}"
+
+: "${GOXX_HOSTARCH=}"
+: "${GOXX_DEBARCH=}"
+: "${GOXX_TRIPLE=}"
+
+: "${CGO_ENABLED=}"
+: "${GOARCH=}"
+: "${GOOS=}"
+: "${GOARM=}"
+: "${GOBIN=}"
+: "${AR=}"
+: "${CC=}"
+: "${CXX=}"
+: "${CGO_CFLAGS=}"
+: "${CGO_CXXFLAGS=}"
+
+set -e
+
+case "$(uname -m)" in
+  "x86_64")
+    GOXX_HOSTARCH="amd64"
+    ;;
+  "i386")
+    GOXX_HOSTARCH="i386"
+    ;;
+  "aarch64")
+    GOXX_HOSTARCH="arm64"
+    ;;
+  "arm64")
+    GOXX_HOSTARCH="arm64"
+    ;;
+  "armv7l")
+    GOXX_HOSTARCH="armhf"
+    ;;
+  "armv6l")
+    GOXX_HOSTARCH="armel"
+    ;;
+  "armv5l")
+    GOXX_HOSTARCH="armel"
+    ;;
+  "riscv64")
+    GOXX_HOSTARCH="riscv64"
+    ;;
+  "ppc64le")
+    GOXX_HOSTARCH="ppc64le"
+    ;;
+  "s390x")
+    GOXX_HOSTARCH="s390x"
+    ;;
+esac
+
+if [ -n "$TARGETPLATFORM" ]; then
+  os="$(echo $TARGETPLATFORM | cut -d"/" -f1)"
+  arch="$(echo $TARGETPLATFORM | cut -d"/" -f2)"
+  if [ -n "$os" ] && [ -n "$arch" ]; then
+    GOOS="$os"
+    GOARCH="$arch"
+    if [ "$arch" = "arm" ]; then
+      case "$(echo $TARGETPLATFORM | cut -d"/" -f3)" in
+      "v5")
+        GOARM="5"
+        ;;
+      "v6")
+        GOARM="6"
+        ;;
+      *)
+        GOARM="7"
+        ;;
+      esac
+    fi
+  fi
+fi
+
+if [ -n "$TARGETOS" ]; then
+  GOOS="$TARGETOS"
+fi
+
+if [ -n "$TARGETARCH" ]; then
+  GOARCH="$TARGETARCH"
+fi
+
+if [ "$TARGETARCH" = "arm" ]; then
+  if [ -n "$TARGETVARIANT" ]; then
+    case "$TARGETVARIANT" in
+    "v5")
+      GOARM="5"
+      ;;
+    "v6")
+      GOARM="6"
+      ;;
+    *)
+      GOARM="7"
+      ;;
+    esac
+  else
+    GOARM="7"
+  fi
+fi
+
+if [ "$GOOS" = "wasi" ]; then
+  GOOS="js"
+fi
+
+case "$GOARCH" in
+  "386")
+    GOXX_DEBARCH="i386"
+    GOXX_TRIPLE="i686-linux-gnu"
+    if [ "$GOOS" = "windows" ]; then
+      GOXX_TRIPLE="i686-w64-mingw32"
+    fi
+    if [ "$CGO_ENABLED" = "1" ]; then
+      AR="i686-linux-gnu-ar"
+      CC="i686-linux-gnu-gcc"
+      CXX="i686-linux-gnu-g++"
+      if [ "$GOOS" = "windows" ]; then
+        AR="i686-w64-mingw32-ar"
+        CC="i686-w64-mingw32-gcc"
+        CXX="i686-w64-mingw32-g++"
+        CGO_CFLAGS="-D_WIN32_WINNT=0x0400"
+        CGO_CXXFLAGS="-D_WIN32_WINNT=0x0400"
+      fi
+    fi
+    ;;
+  "amd64")
+    GOXX_DEBARCH="amd64"
+    GOXX_TRIPLE="x86_64-linux-gnu"
+    if [ "$GOOS" = "darwin" ]; then
+      GOXX_TRIPLE=""
+    elif [ "$GOOS" = "windows" ]; then
+      GOXX_TRIPLE="x86_64-w64-mingw32"
+    fi
+    if [ "$CGO_ENABLED" = "1" ]; then
+      AR="x86_64-linux-gnu-ar"
+      CC="x86_64-linux-gnu-gcc"
+      CXX="x86_64-linux-gnu-g++"
+      if [ "$GOOS" = "darwin" ]; then
+        CC="o64-clang"
+        CXX="o64-clang++"
+      elif [ "$GOOS" = "windows" ]; then
+        AR="x86_64-w64-mingw32-ar"
+        CC="x86_64-w64-mingw32-gcc"
+        CXX="x86_64-w64-mingw32-g++"
+        CGO_CFLAGS="-D_WIN32_WINNT=0x0400"
+        CGO_CXXFLAGS="-D_WIN32_WINNT=0x0400"
+      fi
+    fi
+    ;;
+  "arm")
+    case "$GOARM" in
+    "5")
+      GOXX_DEBARCH="armel"
+      GOXX_TRIPLE="arm-linux-gnueabi"
+      if [ "$CGO_ENABLED" = "1" ]; then
+        AR="arm-linux-gnueabi-ar"
+        CC="arm-linux-gnueabi-gcc"
+        CXX="arm-linux-gnueabi-g++"
+        CGO_CFLAGS="-march=armv5t"
+        CGO_CXXFLAGS="-march=armv5t"
+      fi
+      ;;
+    "6")
+      GOXX_DEBARCH="armel"
+      GOXX_TRIPLE="arm-linux-gnueabi"
+      if [ "$CGO_ENABLED" = "1" ]; then
+        AR="arm-linux-gnueabi-ar"
+        CC="arm-linux-gnueabi-gcc"
+        CXX="arm-linux-gnueabi-g++"
+        CGO_CFLAGS="-march=armv6"
+        CGO_CXXFLAGS="-march=armv6"
+      fi
+      ;;
+    "7")
+      GOXX_DEBARCH="armhf"
+      GOXX_TRIPLE="arm-linux-gnueabihf"
+      if [ "$CGO_ENABLED" = "1" ]; then
+        AR="arm-linux-gnueabihf-ar"
+        CC="arm-linux-gnueabihf-gcc"
+        CXX="arm-linux-gnueabihf-g++"
+        CGO_CFLAGS="-march=armv7-a -fPIC"
+        CGO_CXXFLAGS="-march=armv7-a -fPIC"
+      fi
+      ;;
+    *)
+      GOXX_DEBARCH="armhf"
+      GOXX_TRIPLE="arm-linux-gnueabihf"
+      if [ "$CGO_ENABLED" = "1" ]; then
+        AR="arm-linux-gnueabihf-ar"
+        CC="arm-linux-gnueabihf-gcc"
+        CXX="arm-linux-gnueabihf-g++"
+      fi
+      ;;
+    esac
+    ;;
+  "arm64")
+    GOXX_DEBARCH="arm64"
+    GOXX_TRIPLE="aarch64-linux-gnu"
+    if [ "$GOOS" = "darwin" ]; then
+      GOXX_TRIPLE=""
+    elif [ "$GOOS" = "windows" ]; then
+      GOXX_TRIPLE="aarch64-w64-mingw32"
+    fi
+    if [ "$CGO_ENABLED" = "1" ]; then
+      AR="aarch64-linux-gnu-ar"
+      CC="aarch64-linux-gnu-gcc"
+      CXX="aarch64-linux-gnu-g++"
+      if [ "$GOOS" = "darwin" ]; then
+        CC="o64-clang"
+        CXX="o64-clang++"
+      elif [ "$GOOS" = "windows" ]; then
+        AR="aarch64-w64-mingw32-ar"
+        CC="aarch64-w64-mingw32-gcc"
+        CXX="aarch64-w64-mingw32-g++"
+        CGO_CFLAGS="-D_WIN32_WINNT=0x0400"
+        CGO_CXXFLAGS="-D_WIN32_WINNT=0x0400"
+      fi
+    fi
+    ;;
+  "mips")
+    GOXX_DEBARCH="mips"
+    GOXX_TRIPLE="mips-linux-gnu"
+    if [ "$CGO_ENABLED" = "1" ]; then
+      AR="mips-linux-gnu-ar"
+      CC="mips-linux-gnu-gcc"
+      CXX="mips-linux-gnu-g++"
+    fi
+    ;;
+  "mipsle")
+    GOXX_DEBARCH="mipsel"
+    GOXX_TRIPLE="mipsel-linux-gnu"
+    if [ "$CGO_ENABLED" = "1" ]; then
+      AR="mipsel-linux-gnu-ar"
+      CC="mipsel-linux-gnu-gcc"
+      CXX="mipsel-linux-gnu-g++"
+    fi
+    ;;
+  "mips64")
+    GOXX_DEBARCH="mips64"
+    GOXX_TRIPLE="mips64-linux-gnu"
+    if [ "$CGO_ENABLED" = "1" ]; then
+      AR="mips64-linux-gnuabi64-ar"
+      CC="mips64-linux-gnuabi64-gcc"
+      CXX="mips64-linux-gnuabi64-g++"
+    fi
+    ;;
+  "mips64le")
+    GOXX_DEBARCH="mips64el"
+    GOXX_TRIPLE="mips64el-linux-gnu"
+    if [ "$CGO_ENABLED" = "1" ]; then
+      AR="mips64el-linux-gnuabi64-ar"
+      CC="mips64el-linux-gnuabi64-gcc"
+      CXX="mips64el-linux-gnuabi64-g++"
+    fi
+    ;;
+  "ppc64le")
+    GOXX_DEBARCH="ppc64el"
+    GOXX_TRIPLE="powerpc64le-linux-gnu"
+    if [ "$CGO_ENABLED" = "1" ]; then
+      AR="powerpc64le-linux-gnu-ar"
+      CC="powerpc64le-linux-gnu-gcc"
+      CXX="powerpc64le-linux-gnu-g++"
+    fi
+    ;;
+  "riscv64")
+    GOXX_DEBARCH="riscv64"
+    GOXX_TRIPLE="riscv64-linux-gnu"
+    if [ "$CGO_ENABLED" = "1" ]; then
+      AR="riscv64-linux-gnu-ar"
+      CC="riscv64-linux-gnu-gcc"
+      CXX="riscv64-linux-gnu-g++"
+    fi
+    ;;
+  "s390x")
+    GOXX_DEBARCH="s390x"
+    GOXX_TRIPLE="s390x-linux-gnu"
+    if [ "$CGO_ENABLED" = "1" ]; then
+      AR="s390x-linux-gnu-ar"
+      CC="s390x-linux-gnu-gcc"
+      CXX="s390x-linux-gnu-g++"
+    fi
+    ;;
+esac
