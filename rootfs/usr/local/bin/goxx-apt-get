@@ -18,31 +18,31 @@ deb [arch=$arch] $securi $release-security main restricted universe multiverse
 EOL
 }
 
-case "${GOXX_HOSTARCH}" in
+if [ -z "${GOXX_SKIP_APT_PORTS}" ]; then
+  case "${GOXX_HOSTARCH}" in
   amd64 | i386)
-    setaptsources "/etc/apt/sources.list" "$GOXX_HOSTARCH" "http://archive.ubuntu.com/ubuntu/" "http://security.ubuntu.com/ubuntu/"
-    ;;
-  *)
-    setaptsources "/etc/apt/sources.list" "$GOXX_HOSTARCH" "http://ports.ubuntu.com/ubuntu-ports/" "http://ports.ubuntu.com/ubuntu-ports/"
-    ;;
-esac
-
-if [ "$GOOS" = "linux" ] && [ "$GOXX_HOSTARCH" != "$GOXX_DEBARCH" ]; then
-  case "${GOXX_DEBARCH}" in
-    amd64 | i386)
-      setaptsources "/etc/apt/sources.list.d/port-$GOXX_DEBARCH.list" "$GOXX_DEBARCH" "http://archive.ubuntu.com/ubuntu/" "http://security.ubuntu.com/ubuntu/"
+      setaptsources "/etc/apt/sources.list" "$GOXX_HOSTARCH" "http://archive.ubuntu.com/ubuntu/" "http://security.ubuntu.com/ubuntu/"
       ;;
     *)
-      setaptsources "/etc/apt/sources.list.d/port-$GOXX_DEBARCH.list" "$GOXX_DEBARCH" "http://ports.ubuntu.com/ubuntu-ports/" "http://ports.ubuntu.com/ubuntu-ports/"
+      setaptsources "/etc/apt/sources.list" "$GOXX_HOSTARCH" "http://ports.ubuntu.com/ubuntu-ports/" "http://ports.ubuntu.com/ubuntu-ports/"
       ;;
   esac
-fi
-
-if ! dpkg --print-foreign-architectures | grep "$GOXX_DEBARCH" >/dev/null; then
   if [ "$GOOS" = "linux" ] && [ "$GOXX_HOSTARCH" != "$GOXX_DEBARCH" ]; then
-    dpkg --add-architecture "$GOXX_DEBARCH"
+    case "${GOXX_DEBARCH}" in
+      amd64 | i386)
+        setaptsources "/etc/apt/sources.list.d/port-$GOXX_DEBARCH.list" "$GOXX_DEBARCH" "http://archive.ubuntu.com/ubuntu/" "http://security.ubuntu.com/ubuntu/"
+        ;;
+      *)
+        setaptsources "/etc/apt/sources.list.d/port-$GOXX_DEBARCH.list" "$GOXX_DEBARCH" "http://ports.ubuntu.com/ubuntu-ports/" "http://ports.ubuntu.com/ubuntu-ports/"
+        ;;
+    esac
   fi
-  apt-get update
+  if ! dpkg --print-foreign-architectures | grep "$GOXX_DEBARCH" >/dev/null; then
+    if [ "$GOOS" = "linux" ] && [ "$GOXX_HOSTARCH" != "$GOXX_DEBARCH" ]; then
+      dpkg --add-architecture "$GOXX_DEBARCH"
+    fi
+    apt-get update
+  fi
 fi
 
 if [ "$GOOS" = "linux" ] && [ "$GOXX_DEBARCH" = "$GOXX_HOSTARCH" ]; then
