@@ -25,33 +25,63 @@ set -e
 case "$(uname -m)" in
   "x86_64")
     GOXX_HOSTARCH="amd64"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/amd64"
+    fi
     ;;
   "i386")
     GOXX_HOSTARCH="i386"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/386"
+    fi
     ;;
   "aarch64")
     GOXX_HOSTARCH="arm64"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/arm64"
+    fi
     ;;
   "arm64")
     GOXX_HOSTARCH="arm64"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/arm64"
+    fi
     ;;
   "armv7l")
     GOXX_HOSTARCH="armhf"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/arm/v7"
+    fi
     ;;
   "armv6l")
     GOXX_HOSTARCH="armel"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/arm/v6"
+    fi
     ;;
   "armv5l")
     GOXX_HOSTARCH="armel"
-    ;;
-  "riscv64")
-    GOXX_HOSTARCH="riscv64"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/arm/v5"
+    fi
     ;;
   "ppc64le")
     GOXX_HOSTARCH="ppc64le"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/ppc64le"
+    fi
+    ;;
+  "riscv64")
+    GOXX_HOSTARCH="riscv64"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/riscv64"
+    fi
     ;;
   "s390x")
     GOXX_HOSTARCH="s390x"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/s390x"
+    fi
     ;;
 esac
 
