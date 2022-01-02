@@ -19,6 +19,7 @@ ___
   * [Wrappers](#wrappers)
   * [CGO](#cgo)
   * [Override MacOSX cross toolchain](#override-macosx-cross-toolchain)
+  * [Install cross-compilers for all platforms](#install-cross-compilers-for-all-platforms)
 * [Contributing](#contributing)
 * [Lisence](#license)
 
@@ -220,6 +221,29 @@ RUN --mount=type=bind,source=. \
   --mount=type=cache,target=/go/pkg/mod \
   goxx-go build -o /out/hello ./hello.go
 ```
+
+### Install cross-compilers for all platforms
+
+In some case you may want to install cross-compilers for all supported platforms
+into a fat image:
+
+```dockerfile
+# syntax=docker/dockerfile:1-labs
+
+ARG PLATFORMS="linux/386 linux/amd64 linux/arm64 linux/arm/v5 linux/arm/v6 linux/arm/v7 linux/mips linux/mipsle linux/mips64 linux/mips64le linux/ppc64le linux/riscv64 linux/s390x windows/386 windows/amd64"
+
+FROM --platform=$BUILDPLATFORM crazymax/goxx:1.17 AS base
+ARG PLATFORMS
+RUN <<EOT
+export GOXX_SKIP_APT_PORTS=1
+goxx-apt-get update
+for p in $PLATFORMS; do
+  TARGETPLATFORM=$p goxx-apt-get install -y binutils gcc g++ pkg-config
+done
+EOT
+```
+
+> **Note**: This is not recommended for production use.
 
 ## Contributing
 
