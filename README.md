@@ -90,7 +90,8 @@ WORKDIR /go/src/hello
 
 FROM base AS build
 ARG TARGETPLATFORM
-RUN goxx-apt-get install -y binutils gcc g++ pkg-config
+RUN --mount=type=cache,target=/var/cache/apt \
+  goxx-apt-get install -y binutils gcc g++ pkg-config
 RUN --mount=type=bind,source=. \
   --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/go/pkg/mod \
@@ -209,7 +210,8 @@ WORKDIR /go/src/hello
 
 FROM base AS build
 ARG TARGETPLATFORM
-RUN goxx-apt-get install -y binutils gcc g++ pkg-config
+RUN --mount=type=cache,target=/var/cache/apt \
+  goxx-apt-get install -y binutils gcc g++ pkg-config
 RUN --mount=type=bind,source=. \
   --mount=from=osxcross,target=/osxcross,src=/osxcross,rw \
   --mount=type=cache,target=/root/.cache \
