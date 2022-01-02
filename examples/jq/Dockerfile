@@ -9,7 +9,8 @@ WORKDIR /src
 
 FROM base AS build
 ARG TARGETPLATFORM
-RUN --mount=type=cache,target=/var/cache/apt \
+RUN --mount=type=cache,sharing=private,target=/var/cache/apt \
+  --mount=type=cache,sharing=private,target=/var/lib/apt/lists \
   goxx-apt-get install -y binutils gcc g++ pkg-config libjq-dev libonig-dev
 RUN goxx-macports install jq
 ENV OSXCROSS_MP_INC=1
