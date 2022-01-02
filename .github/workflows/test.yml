@@ -24,6 +24,11 @@ jobs:
           - cpp
           - gorm
           - jq
+        include:
+          - target: artifact-all
+          - go_version: 1.17.5
+            example: all
+            target: image
     services:
       registry:
         image: registry:2
@@ -51,7 +56,7 @@ jobs:
         uses: docker/bake-action@v1
         with:
           files: ./examples/${{ matrix.example }}/docker-bake.hcl
-          targets: artifact-all
+          targets: ${{ matrix.target }}
           set: |
             *.context=./examples/${{ matrix.example }}
         env:
