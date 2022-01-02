@@ -226,7 +226,9 @@ case "$GOARCH" in
     ;;
 esac
 
-if [ "$GOOS" != "linux" ] || [ "$GOXX_HOSTARCH" != "$GOXX_DEBARCH" ]; then
+if [ "$GOOS" = "linux" ] && [ "$GOXX_HOSTARCH" = "$GOXX_DEBARCH" ]; then
+  GOXX_CROSS=0
+else
   GOXX_CROSS=1
 fi
 
