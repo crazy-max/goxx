@@ -5,6 +5,7 @@
 : "${TARGETARCH=}"
 : "${TARGETVARIANT=}"
 
+: "${GOXX_CROSS=}"
 : "${GOXX_HOSTARCH=}"
 : "${GOXX_DEBARCH=}"
 : "${GOXX_TRIPLE=}"
@@ -224,6 +225,10 @@ case "$GOARCH" in
     GOXX_TRIPLE="s390x-linux-gnu"
     ;;
 esac
+
+if [ "$GOOS" != "linux" ] || [ "$GOXX_HOSTARCH" != "$GOXX_DEBARCH" ]; then
+  GOXX_CROSS=1
+fi
 
 if [ "$CGO_ENABLED" = "1" ]; then
   if [ "$GOOS" = "darwin" ]; then

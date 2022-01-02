@@ -27,7 +27,7 @@ if [ -z "${GOXX_SKIP_APT_PORTS}" ]; then
       setaptsources "/etc/apt/sources.list" "$GOXX_HOSTARCH" "http://ports.ubuntu.com/ubuntu-ports/" "http://ports.ubuntu.com/ubuntu-ports/"
       ;;
   esac
-  if [ "$GOOS" = "linux" ] && [ "$GOXX_HOSTARCH" != "$GOXX_DEBARCH" ]; then
+  if [ -n "$GOXX_CROSS" ]; then
     case "${GOXX_DEBARCH}" in
       amd64 | i386)
         setaptsources "/etc/apt/sources.list.d/port-$GOXX_DEBARCH.list" "$GOXX_DEBARCH" "http://archive.ubuntu.com/ubuntu/" "http://security.ubuntu.com/ubuntu/"
@@ -38,7 +38,7 @@ if [ -z "${GOXX_SKIP_APT_PORTS}" ]; then
     esac
   fi
   if ! dpkg --print-foreign-architectures | grep "$GOXX_DEBARCH" >/dev/null; then
-    if [ "$GOOS" = "linux" ] && [ "$GOXX_HOSTARCH" != "$GOXX_DEBARCH" ]; then
+    if [ -n "$GOXX_CROSS" ]; then
       dpkg --add-architecture "$GOXX_DEBARCH"
     fi
     apt-get update
@@ -97,13 +97,13 @@ done
 empty=1
 for p in ${packages}; do
   n=
-  if [ -n "$nocross" ]; then
+  if [ -z "$GOXX_CROSS" ] && [ -n "$(apt-cache madison "${p}" 2>/dev/null)" ]; then
     n=${p}
-  elif apt show "${p}-${suffix}" >/dev/null 2>/dev/null; then
+  elif [ -n "$(apt-cache madison "${p}-${suffix}" 2>/dev/null)" ]; then
     n="${p}-${suffix}"
-  elif [ "${GOOS}" = "linux" ] && apt show "${p}-${GOXX_DEBARCH}-cross" >/dev/null 2>/dev/null; then
+  elif [ "${GOOS}" = "linux" ] && [ -n "$(apt-cache madison "${p}-${GOXX_DEBARCH}-cross" 2>/dev/null)" ]; then
     n="${p}-${GOXX_DEBARCH}-cross"
-  elif [ "${GOOS}" = "linux" ]; then
+  elif [ "${GOOS}" = "linux" ] && [ -n "$(apt-cache madison "${p}:${GOXX_DEBARCH}" 2>/dev/null)" ]; then
     n="${p}:${GOXX_DEBARCH}"
   else
     continue
