@@ -113,15 +113,15 @@ ENTRYPOINT [ "/hello" ]
 * `ARG TARGETPLATFORM` is also an ARG in the global scope that will be set
   to the platform of the target that will default to your current platform or
   can be defined via the [`--platform` flag](https://docs.docker.com/engine/reference/commandline/buildx_build/#platform)
-  of buildx so `goreleaser-xx` will be able to automatically build against
-  the right platform.
+  of buildx so [`goxx-*` wrappers](#wrappers) will be able to automatically
+  build against the right platform.
 
 > More details about multi-platform builds in this [blog post](https://medium.com/@tonistiigi/faster-multi-platform-builds-dockerfile-cross-compilation-guide-part-1-ec087c719eaf).
 
 Let's run a simple build against the `artifact` target in our Dockerfile:
 
 ```shell
-# build and output content of the artifact stage that contains the archive in ./dist
+# build and output content of the artifact stage that contains the binaries in ./dist
 docker buildx build \
   --platform "linux/amd64,linux/arm64,linux/arm/v7,darwin/amd64" \
   --output "./dist" \
@@ -139,8 +139,7 @@ $ tree ./dist
 │ ├── hello
 ```
 
-You can also create a multi-platform image in addition to the generated
-artifacts:
+You can also create a multi-platform image in addition to the artifacts:
 
 ```shell
 docker buildx build \
