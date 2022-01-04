@@ -2,6 +2,7 @@
 
 ARG GOXX_BASE
 
+FROM --platform=$BUILDPLATFORM crazymax/osxcross:11.3 AS osxcross
 FROM --platform=$BUILDPLATFORM $GOXX_BASE AS base
 ENV GO111MODULE=auto
 ENV CGO_ENABLED=1
@@ -13,6 +14,7 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apt \
   --mount=type=cache,sharing=private,target=/var/lib/apt/lists \
   goxx-apt-get install -y binutils gcc g++ pkg-config
 RUN --mount=type=bind,source=. \
+  --mount=from=osxcross,target=/osxcross,src=/osxcross,rw \
   --mount=type=cache,target=/root/.cache \
   goxx-go env && goxx-go build -o /out/c-xx .
 
