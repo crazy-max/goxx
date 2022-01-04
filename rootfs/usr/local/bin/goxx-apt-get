@@ -4,6 +4,13 @@ set -e
 
 source goxx-env
 
+exitnolinux() {
+  if [ "${GOOS}" != "linux" ]; then
+    echo >&2 "WARN: skipping packages installation on ${GOOS}"
+    exit 0
+  fi
+}
+
 setaptsources() {
   local file=$1
   local arch=$2
@@ -113,7 +120,7 @@ for p in ${packages}; do
 done
 
 if [ -n "$empty" ]; then
-  exit 0
+  exitnolinux
 fi
 
 set -x

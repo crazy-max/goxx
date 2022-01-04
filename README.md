@@ -16,12 +16,12 @@ ___
 * [Usage](#usage)
 * [Build](#build)
 * [Notes](#notes)
+  * [MacOSX cross toolchain](#macosx-cross-toolchain)
   * [Wrappers](#wrappers)
   * [CGO](#cgo)
-  * [Override MacOSX cross toolchain](#override-macosx-cross-toolchain)
   * [Install cross-compilers for all platforms](#install-cross-compilers-for-all-platforms)
 * [Contributing](#contributing)
-* [Lisence](#license)
+* [License](#license)
 
 ## About
 
@@ -56,8 +56,8 @@ Image: crazymax/goxx:latest
 
 | Platform             | `CC`                           | `CXX`                          |
 |----------------------|--------------------------------|--------------------------------|
-| `darwin/amd64`       | `o64-clang`                    | `o64-clang++`                  |
-| `darwin/arm64`       | `o64-clang`                    | `o64-clang++`                  |
+| `darwin/amd64`¹      | `o64-clang`                    | `o64-clang++`                  |
+| `darwin/arm64`¹      | `o64-clang`                    | `o64-clang++`                  |
 | `linux/386`          | `i686-linux-gnu-gcc`           | `i686-linux-gnu-g++`           |
 | `linux/amd64`        | `x86_64-linux-gnu-gcc`         | `x86_64-linux-gnu-g++`         |
 | `linux/arm64`        | `aarch64-linux-gnu-gcc`        | `aarch64-linux-gnu-g++`        |
@@ -73,6 +73,9 @@ Image: crazymax/goxx:latest
 | `linux/s390x`        | `s390x-linux-gnu-gcc`          | `s390x-linux-gnu-g++`          |
 | `windows/386`        | `i686-w64-mingw32-gcc`         | `i686-w64-mingw32-g++`         |
 | `windows/amd64`      | `x86_64-w64-mingw32-gcc`       | `x86_64-w64-mingw32-g++`       |
+
+> ¹ `darwin*` platform requires the [MacOSX cross toolchain](#macosx-cross-toolchain)
+> if using CGO.
 
 ## Usage
 
@@ -176,6 +179,37 @@ export GOXX_BASE=localhost:5000/goxx:latest
 
 ## Notes
 
+### MacOSX cross toolchain
+
+You can use the MacOSX cross toolchain provided by [`crazymax/osxcross`](https://github.com/crazy-max/docker-osxcross)
+image to build against the `darwin` platform with CGO.
+
+Using the `COPY` command:
+
+```dockerfile
+FROM --platform=$BUILDPLATFORM crazymax/osxcross:11.3 AS osxcross
+FROM base AS build
+COPY --from=osxcross /osxcross /osxcross
+ARG TARGETPLATFORM
+RUN --mount=type=bind,source=. \
+  --mount=type=cache,target=/root/.cache \
+  --mount=type=cache,target=/go/pkg/mod \
+  goxx-go build -o /out/hello ./hello.go
+```
+
+Or a `RUN` mount:
+
+```dockerfile
+FROM --platform=$BUILDPLATFORM crazymax/osxcross:11.3 AS osxcross
+FROM base AS build
+ARG TARGETPLATFORM
+RUN --mount=type=bind,source=. \
+  --mount=from=osxcross,target=/osxcross,src=/osxcross,rw \
+  --mount=type=cache,target=/root/.cache \
+  --mount=type=cache,target=/go/pkg/mod \
+  goxx-go build -o /out/hello ./hello.go
+```
+
 ### Wrappers
 
 Wrappers are a significant part of this repo to dynamically handle the build
@@ -194,32 +228,6 @@ By default, CGO is enabled in Go when compiling for native architecture and
 disabled when cross-compiling. It's therefore recommended to always set
 `CGO_ENABLED=0` or `CGO_ENABLED=1` when cross-compiling depending on whether
 you need to use CGO or not.
-
-### Override MacOSX cross toolchain
-
-You can also use another version of the MacOSX cross toolchain provided by
-[`crazymax/osxcross`](https://github.com/crazy-max/docker-osxcross) image:
-
-```dockerfile
-# syntax=docker/dockerfile:1
-
-FROM --platform=$BUILDPLATFORM crazymax/osxcross:10.13 AS osxcross
-FROM --platform=$BUILDPLATFORM crazymax/goxx:1.17 AS base
-ENV GO111MODULE=auto
-ENV CGO_ENABLED=1
-WORKDIR /go/src/hello
-
-FROM base AS build
-ARG TARGETPLATFORM
-RUN --mount=type=cache,sharing=private,target=/var/cache/apt \
-  --mount=type=cache,sharing=private,target=/var/lib/apt/lists \
-  goxx-apt-get install -y binutils gcc g++ pkg-config
-RUN --mount=type=bind,source=. \
-  --mount=from=osxcross,target=/osxcross,src=/osxcross,rw \
-  --mount=type=cache,target=/root/.cache \
-  --mount=type=cache,target=/go/pkg/mod \
-  goxx-go build -o /out/hello ./hello.go
-```
 
 ### Install cross-compilers for all platforms
 

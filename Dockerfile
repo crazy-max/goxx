@@ -1,23 +1,18 @@
-# syntax=docker/dockerfile:1.3-labs
+# syntax=docker/dockerfile:1-labs
 
 ARG UBUNTU_VERSION="21.04"
-ARG OSXCROSS_VERSION="11.3"
 ARG GO_VERSION="1.17.5"
 
-FROM crazymax/osxcross:${OSXCROSS_VERSION} AS osxcross
 FROM ubuntu:${UBUNTU_VERSION} AS base
 RUN export DEBIAN_FRONTEND="noninteractive" \
   && apt-get update \
   && apt-get install --no-install-recommends -y \
-    autoconf \
-    automake \
     bash \
     bc \
     binutils \
     bzr \
     ca-certificates \
     clang \
-    cmake \
     curl \
     devscripts \
     gdb \
@@ -25,7 +20,6 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     libtool \
     llvm \
     lzma \
-    make \
     multistrap \
     swig \
     texinfo \
@@ -56,7 +50,6 @@ go version
 EOT
 
 FROM base
-COPY --from=osxcross /osxcross /osxcross
 COPY --from=golang /usr/local/go /usr/local/go
 
 ENV GOROOT="/usr/local/go"
