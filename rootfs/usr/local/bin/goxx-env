@@ -160,6 +160,9 @@ case "$GOARCH" in
     "5")
       GOXX_DEBARCH="armel"
       GOXX_TRIPLE="arm-linux-gnueabi"
+      if [ "$GOOS" = "windows" ]; then
+        GOXX_TRIPLE="armv5-w64-mingw32"
+      fi
       if [ "$CGO_ENABLED" = "1" ]; then
         CGO_CFLAGS="-march=armv5t"
         CGO_CXXFLAGS="-march=armv5t"
@@ -168,6 +171,9 @@ case "$GOARCH" in
     "6")
       GOXX_DEBARCH="armel"
       GOXX_TRIPLE="arm-linux-gnueabi"
+      if [ "$GOOS" = "windows" ]; then
+        GOXX_TRIPLE="armv6-w64-mingw32"
+      fi
       if [ "$CGO_ENABLED" = "1" ]; then
         CGO_CFLAGS="-march=armv6"
         CGO_CXXFLAGS="-march=armv6"
@@ -176,6 +182,9 @@ case "$GOARCH" in
     "7")
       GOXX_DEBARCH="armhf"
       GOXX_TRIPLE="arm-linux-gnueabihf"
+      if [ "$GOOS" = "windows" ]; then
+        GOXX_TRIPLE="armv7-w64-mingw32"
+      fi
       if [ "$CGO_ENABLED" = "1" ]; then
         CGO_CFLAGS="-march=armv7-a -fPIC"
         CGO_CXXFLAGS="-march=armv7-a -fPIC"
