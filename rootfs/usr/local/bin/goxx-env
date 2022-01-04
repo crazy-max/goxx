@@ -23,6 +23,22 @@
 
 set -e
 
+# https://github.com/tonistiigi/xx/blob/c6d32015eb3e03de264a54ea9237388b319118b1/base/xx-info#L56-L58
+if [ -n "$TARGETPAIR" ] && [ -z "$TARGETPLATFORM" ]; then
+  os="$(echo "$TARGETPAIR" | cut -d"-" -f1)"
+  arch="$(echo "$TARGETPAIR" | cut -d"-" -f2)"
+  if [ "${arch#armv}" != "${arch}" ]; then
+    variant="${arch#arm}"
+    arch="arm"
+  fi
+  if [ -n "$os" ] && [ -n "$arch" ]; then
+    TARGETPLATFORM="$os/$arch"
+    if [ -n "$variant" ]; then
+      TARGETPLATFORM="$TARGETPLATFORM/$variant"
+    fi
+  fi
+fi
+
 case "$(uname -m)" in
   "x86_64")
     GOXX_HOSTARCH="amd64"
