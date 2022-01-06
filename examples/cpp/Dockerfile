@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.3
+# syntax=docker/dockerfile:1
 
 ARG GOXX_BASE
 
@@ -16,7 +16,7 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apt \
 RUN --mount=type=bind,source=. \
   --mount=from=osxcross,target=/osxcross,src=/osxcross,rw \
   --mount=type=cache,target=/root/.cache \
-  goxx-go env && goxx-go build -o /out/cpp-xx .
+  goxx-go env && goxx-go build -v -o /out/cpp-xx .
 
 FROM scratch AS artifact
 COPY --from=build /out /
