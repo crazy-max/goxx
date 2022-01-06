@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.3
+# syntax=docker/dockerfile:1
 
 ARG GOXX_BASE
 
@@ -20,7 +20,7 @@ ENV OSXCROSS_MP_INC=1
 RUN --mount=type=bind,source=.,rw \
   --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/go/pkg/mod \
-  goxx-go env && goxx-go build -o /out/jq-xx .
+  goxx-go env && goxx-go build -v -o /out/jq-xx .
 
 FROM scratch AS artifact
 COPY --from=build /out /

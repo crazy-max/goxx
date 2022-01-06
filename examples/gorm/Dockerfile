@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.3
+# syntax=docker/dockerfile:1-labs
 
 ARG GOXX_BASE
 
@@ -21,8 +21,25 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apt \
 RUN --mount=type=bind,source=.,rw \
   --mount=from=osxcross,target=/osxcross,src=/osxcross,rw \
   --mount=type=cache,target=/root/.cache \
-  --mount=type=cache,target=/go/pkg/mod \
-  goxx-go env && goxx-go build -o /out/gorm-xx .
+  --mount=type=cache,target=/go/pkg/mod <<EOT
+BUILDMODE=
+if [ "$(. goxx-env && echo $GOOS)" != "windows" ]; then
+  case "$(. goxx-env && echo $GOARCH)" in
+    mips*|ppc64)
+      # pie build mode is not supported on mips architectures
+      ;;
+    *)
+      BUILDMODE="-buildmode=pie"
+      ;;
+  esac
+fi
+LDFLAGS="-s -w"
+if [ "$(. goxx-env && echo $GOOS)" = "linux" ]; then
+  LDFLAGS="$LDFLAGS -extldflags -static"
+fi
+goxx-go env
+goxx-go build -v -o /out/gorm-xx -ldflags "$LDFLAGS" $BUILDMODE .
+EOT
 
 FROM scratch AS artifact
 COPY --from=build /out /

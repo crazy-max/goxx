@@ -1,10 +1,13 @@
 # syntax=docker/dockerfile:1-labs
 
-ARG UBUNTU_VERSION="21.04"
+ARG UBUNTU_VERSION="20.04"
 ARG GO_VERSION="1.17.5"
 
 FROM ubuntu:${UBUNTU_VERSION} AS base
 RUN export DEBIAN_FRONTEND="noninteractive" \
+  && apt-get update \
+  && apt-get install --no-install-recommends -y software-properties-common \
+  && add-apt-repository ppa:git-core/ppa \
   && apt-get update \
   && apt-get install --no-install-recommends -y \
     bash \
@@ -16,6 +19,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     curl \
     devscripts \
     gdb \
+    git \
     libssl-dev \
     libtool \
     llvm \
@@ -26,7 +30,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     tzdata \
     uuid \
   && apt-get -y autoremove \
-  && apt-get clean \
+  && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && ln -sf /usr/include/asm-generic /usr/include/asm
 
