@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1-labs
 
 ARG UBUNTU_VERSION="20.04"
-ARG GO_VERSION="1.17.5"
+ARG GO_VERSION="1.17.6"
 
 FROM ubuntu:${UBUNTU_VERSION} AS base
 RUN export DEBIAN_FRONTEND="noninteractive" \
