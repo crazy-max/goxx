@@ -64,10 +64,10 @@ Image: crazymax/goxx:latest
 | `linux/arm/v5`       | `arm-linux-gnueabi-gcc`        | `arm-linux-gnueabi-g++`        |
 | `linux/arm/v6`       | `arm-linux-gnueabi-gcc`        | `arm-linux-gnueabi-g++`        |
 | `linux/arm/v7`       | `arm-linux-gnueabihf-gcc`      | `arm-linux-gnueabihf-g++`      |
-| `linux/mips`         | `mips-linux-gnu-gcc`           | `mips-linux-gnu-g++`           |
-| `linux/mipsle`       | `mipsel-linux-gnu-gcc`         | `mipsel-linux-gnu-g++`         |
-| `linux/mips64`       | `mips64-linux-gnuabi64-gcc`    | `mips64-linux-gnuabi64-g++`    |
-| `linux/mips64le`     | `mips64el-linux-gnuabi64-gcc`  | `mips64el-linux-gnuabi64-g++`  |
+| `linux/mips`²        | `mips-linux-gnu-gcc`           | `mips-linux-gnu-g++`           |
+| `linux/mipsle`²      | `mipsel-linux-gnu-gcc`         | `mipsel-linux-gnu-g++`         |
+| `linux/mips64`²      | `mips64-linux-gnuabi64-gcc`    | `mips64-linux-gnuabi64-g++`    |
+| `linux/mips64le`²    | `mips64el-linux-gnuabi64-gcc`  | `mips64el-linux-gnuabi64-g++`  |
 | `linux/ppc64le`      | `powerpc64le-linux-gnu-gcc`    | `powerpc64le-linux-gnu-g++`    |
 | `linux/riscv64`      | `riscv64-linux-gnu-gcc`        | `riscv64-linux-gnu-g++`        |
 | `linux/s390x`        | `s390x-linux-gnu-gcc`          | `s390x-linux-gnu-g++`          |
@@ -76,6 +76,8 @@ Image: crazymax/goxx:latest
 
 > ¹ `darwin*` platform requires the [MacOSX cross toolchain](#macosx-cross-toolchain)
 > if using CGO.
+>
+> ² compilers for `mips*` archs are not available with `linux/arm64` image.
 
 ## Usage
 
