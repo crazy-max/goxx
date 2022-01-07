@@ -11,22 +11,18 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
   && apt-get update \
   && apt-get install --no-install-recommends -y \
     bash \
-    bc \
     binutils \
-    bzr \
     ca-certificates \
     clang \
     curl \
-    devscripts \
-    gdb \
+    g++ \
+    gcc \
     git \
+    libc6-dev \
     libssl-dev \
-    libtool \
     llvm \
-    lzma \
-    multistrap \
-    swig \
-    texinfo \
+    make \
+    pkg-config \
     tzdata \
     uuid \
   && apt-get -y autoremove \
@@ -35,7 +31,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
   && ln -sf /usr/include/asm-generic /usr/include/asm
 
 FROM base AS golang
-RUN export DEBIAN_FRONTEND="noninteractive" && apt-get update && apt-get install --no-install-recommends -y jq
+RUN export DEBIAN_FRONTEND="noninteractive" && apt-get update && apt-get install --no-install-recommends -y curl jq
 WORKDIR /golang
 RUN curl -m30 --retry 5 --retry-connrefused --retry-delay 5 -sSL "https://go.dev/dl/?mode=json&include=all" -o "godist.json"
 ARG GO_VERSION
