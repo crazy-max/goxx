@@ -7,6 +7,7 @@ source goxx-env
 export GOARCH=$GOARCH
 export GOOS=$GOOS
 export GOARM=$GOARM
+export GOMIPS=$GOMIPS
 export GOBIN=$GOBIN
 
 if command -v "$AR" >/dev/null 2>/dev/null; then
