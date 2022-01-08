@@ -22,6 +22,7 @@ jobs:
         example:
           - c
           - cpp
+          - echo
           - gorm
           - jq
         include:
@@ -61,3 +62,8 @@ jobs:
             *.context=./examples/${{ matrix.example }}
         env:
           GOXX_BASE: localhost:5000/goxx:${{ matrix.go_version }}
+      -
+        name: List artifacts
+        if: ${{ matrix.target == 'artifact-all' }}
+        run: |
+          tree -nh ./dist
