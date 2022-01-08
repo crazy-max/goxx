@@ -15,6 +15,7 @@
 : "${GOOS=}"
 : "${GOARM=}"
 : "${GOMIPS=}"
+: "${GOMIPS64=}"
 : "${GOBIN=}"
 : "${AR=}"
 : "${CC=}"
@@ -151,12 +152,10 @@ if [ "$TARGETARCH" = "arm" ]; then
   fi
 fi
 
-if [[ $TARGETARCH == mips* ]]; then
-  if [ -n "$TARGETVARIANT" ]; then
-    GOMIPS="${TARGETVARIANT}"
-  else
-    GOMIPS="hardfloat"
-  fi
+if [[ $TARGETARCH == mips64* ]] && [[ -n "$TARGETVARIANT" ]]; then
+  GOMIPS64="${TARGETVARIANT}"
+elif [[ $TARGETARCH == mips* ]] && [[ -n "$TARGETVARIANT" ]]; then
+  GOMIPS="${TARGETVARIANT}"
 fi
 
 if [ "$GOOS" = "wasi" ]; then

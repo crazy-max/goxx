@@ -4,11 +4,24 @@ set -e
 
 source goxx-env
 
-export GOARCH=$GOARCH
-export GOOS=$GOOS
-export GOARM=$GOARM
-export GOMIPS=$GOMIPS
-export GOBIN=$GOBIN
+if [ -n "$GOARCH" ]; then
+  export GOARCH=$GOARCH
+fi
+if [ -n "$GOOS" ]; then
+  export GOOS=$GOOS
+fi
+if [ -n "$GOARM" ]; then
+  export GOARM=$GOARM
+fi
+if [ -n "$GOMIPS" ]; then
+  export GOMIPS=$GOMIPS
+fi
+if [ -n "$GOMIPS64" ]; then
+  export GOMIPS64=$GOMIPS64
+fi
+if [ -n "$GOBIN" ]; then
+  export GOBIN=$GOBIN
+fi
 
 if command -v "$AR" >/dev/null 2>/dev/null; then
   export AR=$AR
