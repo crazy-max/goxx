@@ -14,6 +14,7 @@
 : "${GOARCH=}"
 : "${GOOS=}"
 : "${GOARM=}"
+: "${GOMIPS=}"
 : "${GOBIN=}"
 : "${AR=}"
 : "${CC=}"
@@ -147,6 +148,14 @@ if [ "$TARGETARCH" = "arm" ]; then
     esac
   else
     GOARM="7"
+  fi
+fi
+
+if [[ $TARGETARCH == mips* ]]; then
+  if [ -n "$TARGETVARIANT" ]; then
+    GOMIPS="${TARGETVARIANT}"
+  else
+    GOMIPS="hardfloat"
   fi
 fi
 
