@@ -11,17 +11,23 @@
 : "${GOXX_TRIPLE=}"
 
 : "${CGO_ENABLED=}"
-: "${GOARCH=}"
 : "${GOOS=}"
+: "${GOARCH=}"
 : "${GOARM=}"
 : "${GOMIPS=}"
 : "${GOMIPS64=}"
 : "${GOBIN=}"
+
 : "${AR=}"
 : "${CC=}"
 : "${CXX=}"
+: "${PKG_CONFIG=}"
+
 : "${CGO_CFLAGS=}"
+: "${CGO_CPPFLAGS=}"
 : "${CGO_CXXFLAGS=}"
+: "${CGO_FFLAGS=}"
+: "${CGO_LDFLAGS=}"
 
 set -e
 
@@ -84,6 +90,30 @@ case "$(uname -m)" in
       TARGETPLATFORM="linux/arm/v5"
     fi
     ;;
+  "mips")
+    GOXX_HOSTARCH="mips"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/mips"
+    fi
+    ;;
+  "mipsle")
+    GOXX_HOSTARCH="mipsle"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/mipsle"
+    fi
+    ;;
+  "mips64")
+    GOXX_HOSTARCH="mips64"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/mips64"
+    fi
+    ;;
+  "mips64le")
+    GOXX_HOSTARCH="mips64le"
+    if [ -z "$TARGETPLATFORM" ]; then
+      TARGETPLATFORM="linux/mips64le"
+    fi
+    ;;
   "ppc64le")
     GOXX_HOSTARCH="ppc64le"
     if [ -z "$TARGETPLATFORM" ]; then
@@ -108,20 +138,11 @@ if [ -n "$TARGETPLATFORM" ]; then
   os="$(echo $TARGETPLATFORM | cut -d"/" -f1)"
   arch="$(echo $TARGETPLATFORM | cut -d"/" -f2)"
   if [ -n "$os" ] && [ -n "$arch" ]; then
-    GOOS="$os"
-    GOARCH="$arch"
-    if [ "$arch" = "arm" ]; then
-      case "$(echo $TARGETPLATFORM | cut -d"/" -f3)" in
-      "v5")
-        GOARM="5"
-        ;;
-      "v6")
-        GOARM="6"
-        ;;
-      *)
-        GOARM="7"
-        ;;
-      esac
+    TARGETOS="$os"
+    TARGETARCH="$arch"
+    variant="$(echo $TARGETPLATFORM | cut -d"/" -f3)"
+    if [ -n "$variant" ]; then
+      TARGETVARIANT="$variant"
     fi
   fi
 fi
@@ -134,28 +155,28 @@ if [ -n "$TARGETARCH" ]; then
   GOARCH="$TARGETARCH"
 fi
 
-if [ "$TARGETARCH" = "arm" ]; then
-  if [ -n "$TARGETVARIANT" ]; then
-    case "$TARGETVARIANT" in
-    "v5")
-      GOARM="5"
+if [ -n "$TARGETVARIANT" ]; then
+  case "$TARGETARCH" in
+    arm)
+      case "$TARGETVARIANT" in
+        "v5")
+          GOARM="5"
+          ;;
+        "v6")
+          GOARM="6"
+          ;;
+        *)
+          GOARM="7"
+          ;;
+      esac
       ;;
-    "v6")
-      GOARM="6"
+    mips64|mips64*)
+      GOMIPS64="$TARGETVARIANT"
       ;;
-    *)
-      GOARM="7"
+    mips|mips*)
+      GOMIPS="$TARGETVARIANT"
       ;;
-    esac
-  else
-    GOARM="7"
-  fi
-fi
-
-if [[ $TARGETARCH == mips64* ]] && [[ -n "$TARGETVARIANT" ]]; then
-  GOMIPS64="${TARGETVARIANT}"
-elif [[ $TARGETARCH == mips* ]] && [[ -n "$TARGETVARIANT" ]]; then
-  GOMIPS="${TARGETVARIANT}"
+  esac
 fi
 
 if [ "$GOOS" = "wasi" ]; then
@@ -273,6 +294,7 @@ if [ "$CGO_ENABLED" = "1" ]; then
     AR="$GOXX_TRIPLE-ar"
     CC="$GOXX_TRIPLE-gcc"
     CXX="$GOXX_TRIPLE-g++"
+    PKG_CONFIG="$GOXX_TRIPLE-pkg-config"
   fi
   if [ "$GOOS" = "windows" ]; then
     CGO_CFLAGS="-D_WIN32_WINNT=0x0400"
