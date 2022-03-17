@@ -58,8 +58,8 @@ jobs:
     needs: prepare
     runs-on: ubuntu-latest
     env:
-      LATEST_117: 1.17.7
-      LATEST_116: 1.16.14
+      LATEST_117: 1.17.8
+      LATEST_116: 1.16.15
     strategy:
       fail-fast: false
       matrix:
@@ -79,6 +79,7 @@ jobs:
           - 1.16.12
           - 1.16.13
           - 1.16.14
+          - 1.16.15
           - 1.17.0
           - 1.17.1
           - 1.17.2
@@ -87,6 +88,7 @@ jobs:
           - 1.17.5
           - 1.17.6
           - 1.17.7
+          - 1.17.8
     steps:
       -
         name: Checkout
