@@ -170,7 +170,7 @@ docker buildx create --name goxx --driver-opt network=host --use
 docker run -d --name registry -p 5000:5000 registry:2
 
 # Build goxx image and push to local registry
-docker buildx bake --set "*.tags=localhost:5000/goxx:latest" --push
+docker buildx bake --set "*.tags=localhost:5000/goxx:latest" --set "*.output=type=registry"
 
 # Examples
 export GOXX_BASE=localhost:5000/goxx:latest
