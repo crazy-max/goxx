@@ -1,9 +1,10 @@
-# syntax=docker/dockerfile:1-labs
+# syntax=docker/dockerfile:1
 
-ARG GOXX_BASE
 ARG PLATFORMS="linux/386 linux/amd64 linux/arm64 linux/arm/v5 linux/arm/v6 linux/arm/v7 linux/mips linux/mipsle linux/mips64 linux/mips64le linux/ppc64le linux/riscv64 linux/s390x windows/386 windows/amd64"
 
-FROM --platform=$BUILDPLATFORM $GOXX_BASE AS base
+FROM --platform=$BUILDPLATFORM crazymax/goxx:latest AS goxx
+
+FROM goxx AS base
 ARG PLATFORMS
 RUN <<EOT
 export GOXX_SKIP_APT_PORTS=1

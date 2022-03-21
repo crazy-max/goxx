@@ -1,10 +1,10 @@
-variable "GOXX_BASE" {
-  default = "crazymax/goxx:latest"
+target "goxx" {
+  context = "../.."
 }
 
 target "_commons" {
-  args = {
-    GOXX_BASE = GOXX_BASE
+  contexts = {
+    goxx = "target:goxx"
   }
 }
 
