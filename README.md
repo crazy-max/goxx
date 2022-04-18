@@ -1,8 +1,8 @@
 [![GitHub release](https://img.shields.io/github/release/crazy-max/goxx.svg?style=flat-square)](https://github.com/crazy-max/goxx/releases/latest)
 [![Build Status](https://img.shields.io/github/workflow/status/crazy-max/goxx/build?label=build&logo=github&style=flat-square)](https://github.com/crazy-max/goxx/actions?query=workflow%3Abuild)
 [![Test Status](https://img.shields.io/github/workflow/status/crazy-max/goxx/test?label=test&logo=github&style=flat-square)](https://github.com/crazy-max/goxx/actions?query=workflow%3Atest)
-[![Docker Stars](https://img.shields.io/docker/stars/crazymax/goxx.svg?style=flat-square&logo=docker)](https://hub.docker.com/r/crazymax/goxx/)
-[![Docker Pulls](https://img.shields.io/docker/pulls/crazymax/goxx.svg?style=flat-square&logo=docker)](https://hub.docker.com/r/crazymax/goxx/)
+[![Docker Stars](https://img.shields.io/docker/stars/crazymax/goxx?style=flat-square&logo=docker)](https://hub.docker.com/r/crazymax/goxx/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/crazymax/goxx?style=flat-square&logo=docker)](https://hub.docker.com/r/crazymax/goxx/)
 
 [![Become a sponsor](https://img.shields.io/badge/sponsor-crazy--max-181717.svg?logo=github&style=flat-square)](https://github.com/sponsors/crazy-max)
 [![Donate Paypal](https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square)](https://www.paypal.me/crazyws)
