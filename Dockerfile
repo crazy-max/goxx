@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1-labs
+# syntax=docker/dockerfile:1
 
 ARG UBUNTU_VERSION="20.04"
 ARG GO_VERSION="1.18.1"
