@@ -46,7 +46,7 @@ jobs:
           driver-opts: network=host
       -
         name: Build goxx
-        uses: docker/bake-action@v1
+        uses: docker/bake-action@v2
         with:
           targets: image
           set: |
@@ -54,7 +54,7 @@ jobs:
           push: true
       -
         name: Build example
-        uses: docker/bake-action@v1
+        uses: docker/bake-action@v2
         with:
           files: ./examples/${{ matrix.example }}/docker-bake.hcl
           targets: ${{ matrix.target }}
