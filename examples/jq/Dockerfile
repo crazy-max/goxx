@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
 
-ARG GOXX_BASE
-
+FROM --platform=$BUILDPLATFORM crazymax/goxx:latest AS goxx
 FROM --platform=$BUILDPLATFORM crazymax/osxcross:11.3 AS osxcross
-FROM --platform=$BUILDPLATFORM $GOXX_BASE AS base
+
+FROM goxx AS base
 COPY --from=osxcross /osxcross /osxcross
 ENV GO111MODULE=auto
 ENV CGO_ENABLED=1

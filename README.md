@@ -163,20 +163,18 @@ Build goxx yourself using Docker [`buildx bake`](https://github.com/docker/build
 git clone https://github.com/crazy-max/goxx.git goxx
 cd goxx
 
-# Create docker container builder
-docker buildx create --name goxx --driver-opt network=host --use
+# create docker container builder
+docker buildx create --name goxx --use
 
-# Create local registry to push the image
-docker run -d --name registry -p 5000:5000 registry:2
+# build goxx image and output to docker with goxx:local tag (default)
+docker buildx bake image-local
 
-# Build goxx image and push to local registry
-docker buildx bake --set "*.tags=localhost:5000/goxx:latest" --set "*.output=type=registry"
-
-# Examples
-export GOXX_BASE=localhost:5000/goxx:latest
+# examples
 (cd ./examples/c ; docker buildx bake artifact-all)
 (cd ./examples/cpp ; docker buildx bake artifact-all)
+(cd ./examples/echo ; docker buildx bake artifact-all)
 (cd ./examples/gorm ; docker buildx bake artifact-all)
+(cd ./examples/jq ; docker buildx bake artifact-all)
 ```
 
 ## Notes
