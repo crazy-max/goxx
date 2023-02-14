@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG UBUNTU_VERSION="20.04"
-ARG GO_VERSION="1.19.5"
+ARG GO_VERSION="1.20.0"
 
 FROM ubuntu:${UBUNTU_VERSION} AS base
 RUN export DEBIAN_FRONTEND="noninteractive" \
@@ -39,14 +39,15 @@ ARG TARGETOS
 ARG TARGETARCH
 ENV PATH="/usr/local/go/bin:$PATH"
 RUN <<EOT
-GO_DIST_FILE=go${GO_VERSION%.0}.${TARGETOS}-${TARGETARCH}.tar.gz
-GO_DIST_URL=https://golang.org/dl/${GO_DIST_FILE}
-SHA256=$(cat godist.json | jq -r ".[] | select(.version==\"go${GO_VERSION%.0}\") | .files[] | select(.filename==\"$GO_DIST_FILE\").sha256")
-curl -sSL "$GO_DIST_URL.asc" -o "go.tgz.asc"
-curl -sSL "$GO_DIST_URL" -o "go.tgz"
-echo "$SHA256 *go.tgz" | sha256sum -c -
-tar -C /usr/local -xzf go.tgz
-go version
+  set -e
+  GO_DIST_FILE=go${GO_VERSION%.0}.${TARGETOS}-${TARGETARCH}.tar.gz
+  GO_DIST_URL=https://golang.org/dl/${GO_DIST_FILE}
+  SHA256=$(cat godist.json | jq -r ".[] | select(.version==\"go${GO_VERSION%.0}\") | .files[] | select(.filename==\"$GO_DIST_FILE\").sha256")
+  curl -sSL "$GO_DIST_URL.asc" -o "go.tgz.asc"
+  curl -sSL "$GO_DIST_URL" -o "go.tgz"
+  echo "$SHA256 *go.tgz" | sha256sum -c -
+  tar -C /usr/local -xzf go.tgz
+  go version
 EOT
 
 FROM base
