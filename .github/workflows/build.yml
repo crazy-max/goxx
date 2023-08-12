@@ -52,8 +52,8 @@ jobs:
     needs: prepare
     runs-on: ubuntu-latest
     env:
-      LATEST_CURRENT: 1.20.5
-      LATEST_PREVIOUS: 1.19.10
+      LATEST_CURRENT: 1.20.7
+      LATEST_PREVIOUS: 1.19.12
     strategy:
       fail-fast: false
       matrix:
@@ -69,12 +69,16 @@ jobs:
           - 1.19.8
           - 1.19.9
           - 1.19.10
+          - 1.19.11
+          - 1.19.12
           - 1.20.0
           - 1.20.1
           - 1.20.2
           - 1.20.3
           - 1.20.4
           - 1.20.5
+          - 1.20.6
+          - 1.20.7
     steps:
       -
         name: Checkout
