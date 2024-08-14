@@ -21,8 +21,8 @@ jobs:
       fail-fast: false
       matrix:
         go_version:
-          - 1.22.1
-          - 1.21.8
+          - 1.23.0
+          - 1.22.6
         example:
           - c
           - cpp
@@ -31,7 +31,7 @@ jobs:
           - jq
         include:
           - target: artifact-all
-          - go_version: 1.22.1
+          - go_version: 1.23.0
             example: all
             target: image
     steps:
