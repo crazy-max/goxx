@@ -65,20 +65,19 @@ jobs:
       # required to push to GHCR
       packages: write
     env:
-      LATEST_CURRENT: 1.23.0
-      LATEST_PREVIOUS: 1.22.6
+      LATEST_CURRENT: 1.24.0
+      LATEST_PREVIOUS: 1.23.6
     strategy:
       fail-fast: false
       matrix:
         go_version:
-          - 1.22.0
-          - 1.22.1
-          - 1.22.2
-          - 1.22.3
-          - 1.22.4
-          - 1.22.5
-          - 1.22.6
           - 1.23.0
+          - 1.23.1
+          - 1.23.2
+          - 1.23.3
+          - 1.23.4
+          - 1.23.5
+          - 1.24.0
     steps:
       -
         name: Checkout
