@@ -62,8 +62,8 @@ jobs:
       # required to push to GHCR
       packages: write
     env:
-      LATEST_CURRENT: 1.24.0
-      LATEST_PREVIOUS: 1.23.6
+      LATEST_CURRENT: 1.24.1
+      LATEST_PREVIOUS: 1.23.7
     strategy:
       fail-fast: false
       matrix:
@@ -74,7 +74,10 @@ jobs:
           - 1.23.3
           - 1.23.4
           - 1.23.5
+          - 1.23.6
+          - 1.23.7
           - 1.24.0
+          - 1.24.1
     steps:
       -
         name: Remove dotnet
