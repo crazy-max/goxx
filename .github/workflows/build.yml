@@ -62,22 +62,22 @@ jobs:
       # required to push to GHCR
       packages: write
     env:
-      LATEST_CURRENT: 1.24.1
-      LATEST_PREVIOUS: 1.23.7
+      LATEST_CURRENT: 1.25.1
+      LATEST_PREVIOUS: 1.24.7
     strategy:
       fail-fast: false
       matrix:
         go_version:
-          - 1.23.0
-          - 1.23.1
-          - 1.23.2
-          - 1.23.3
-          - 1.23.4
-          - 1.23.5
-          - 1.23.6
-          - 1.23.7
           - 1.24.0
           - 1.24.1
+          - 1.24.2
+          - 1.24.3
+          - 1.24.4
+          - 1.24.5
+          - 1.24.6
+          - 1.24.7
+          - 1.25.0
+          - 1.25.1
     steps:
       -
         name: Remove dotnet
