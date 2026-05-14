@@ -55,8 +55,8 @@ jobs:
       contents: read # same as global permissions
       packages: write # required to push to GHCR
     env:
-      LATEST_CURRENT: 1.26.2
-      LATEST_PREVIOUS: 1.25.9
+      LATEST_CURRENT: 1.26.3
+      LATEST_PREVIOUS: 1.25.10
     strategy:
       fail-fast: false
       matrix:
@@ -71,9 +71,11 @@ jobs:
           - 1.25.7
           - 1.25.8
           - 1.25.9
+          - 1.25.10
           - 1.26.0
           - 1.26.1
           - 1.26.2
+          - 1.26.3
     steps:
       -
         name: Remove dotnet
