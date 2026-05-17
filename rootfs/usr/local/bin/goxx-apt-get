@@ -124,6 +124,8 @@ for p in ${packages}; do
     n="${p}-${GOXX_DEBARCH}-cross"
   elif [ "${GOOS}" = "linux" ] && [ -n "$(apt-cache madison "${p}:${GOXX_DEBARCH}" 2>/dev/null)" ]; then
     n="${p}:${GOXX_DEBARCH}"
+  elif [ -n "$(apt-cache madison "${p}" 2>/dev/null)" ]; then
+    n=${p}
   else
     continue
   fi
