@@ -74,9 +74,11 @@ Image: crazymax/goxx:latest
 | `windows/386`        | `i686-w64-mingw32-gcc`         | `i686-w64-mingw32-g++`         |
 | `windows/amd64`      | `x86_64-w64-mingw32-gcc`       | `x86_64-w64-mingw32-g++`       |
 
+> [!NOTE]
 > ¹ `darwin*` platform requires the [MacOSX cross toolchain](#macosx-cross-toolchain)
 > if using CGO.
->
+
+> [!NOTE]
 > ² compilers for `mips*` archs are not available with `linux/arm64` image.
 
 ## Usage
@@ -121,7 +123,8 @@ ENTRYPOINT [ "/hello" ]
   of buildx so [`goxx-*` wrappers](#wrappers) will be able to automatically
   build against the right platform.
 
-> More details about multi-platform builds in this [blog post](https://medium.com/@tonistiigi/faster-multi-platform-builds-dockerfile-cross-compilation-guide-part-1-ec087c719eaf).
+> [!TIP]
+> More details about multi-platform builds in [docker docs](https://docs.docker.com/build/building/multi-platform/).
 
 Let's run a simple build against the `artifact` target in our Dockerfile:
 
@@ -250,7 +253,8 @@ done
 EOT
 ```
 
-> **Note**: This is not recommended for production use.
+> [!CAUTION]
+> This is not recommended for production use.
 
 ## Contributing
 
