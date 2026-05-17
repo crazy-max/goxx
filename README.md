@@ -187,7 +187,7 @@ image to build against the `darwin` platform with CGO.
 Using the `COPY` command:
 
 ```dockerfile
-FROM --platform=$BUILDPLATFORM crazymax/osxcross:11.3 AS osxcross
+FROM --platform=$BUILDPLATFORM crazymax/osxcross:26.1 AS osxcross
 FROM base AS build
 COPY --from=osxcross /osxcross /osxcross
 ARG TARGETPLATFORM
@@ -200,7 +200,7 @@ RUN --mount=type=bind,source=. \
 Or a `RUN` mount:
 
 ```dockerfile
-FROM --platform=$BUILDPLATFORM crazymax/osxcross:11.3 AS osxcross
+FROM --platform=$BUILDPLATFORM crazymax/osxcross:26.1 AS osxcross
 FROM base AS build
 ARG TARGETPLATFORM
 RUN --mount=type=bind,source=. \

@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 FROM --platform=$BUILDPLATFORM crazymax/goxx:latest AS goxx
-FROM --platform=$BUILDPLATFORM crazymax/osxcross:11.3 AS osxcross
+FROM --platform=$BUILDPLATFORM crazymax/osxcross:26.1 AS osxcross
 
 FROM goxx AS base
 COPY --from=osxcross /osxcross /osxcross
