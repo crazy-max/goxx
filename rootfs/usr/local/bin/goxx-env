@@ -231,8 +231,8 @@ case "$GOARCH" in
         GOXX_TRIPLE="armv7-w64-mingw32"
       fi
       if [ "$CGO_ENABLED" = "1" ]; then
-        CGO_CFLAGS="-march=armv7-a -fPIC"
-        CGO_CXXFLAGS="-march=armv7-a -fPIC"
+        CGO_CFLAGS="-march=armv7-a -mfpu=vfpv3-d16 -fPIC"
+        CGO_CXXFLAGS="-march=armv7-a -mfpu=vfpv3-d16 -fPIC"
       fi
       ;;
     *)

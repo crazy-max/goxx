@@ -1,17 +1,15 @@
 # syntax=docker/dockerfile:1
 
-ARG UBUNTU_VERSION="20.04"
+ARG UBUNTU_VERSION="24.04"
 ARG GO_VERSION="1.26.3"
 
 FROM ubuntu:${UBUNTU_VERSION} AS base
 RUN export DEBIAN_FRONTEND="noninteractive" \
   && apt-get update \
-  && apt-get install --no-install-recommends -y software-properties-common \
-  && add-apt-repository ppa:git-core/ppa \
-  && apt-get update \
   && apt-get install --no-install-recommends -y \
     bash \
     binutils \
+    bzip2 \
     ca-certificates \
     clang \
     curl \
@@ -60,6 +58,6 @@ ARG GO_VERSION
 ENV GO_VERSION=${GO_VERSION}
 
 ENV PATH="$GOPATH/bin:/usr/local/go/bin:/osxcross/bin:$PATH"
-ENV LD_LIBRARY_PATH="/osxcross/lib:$LD_LIBRARY_PATH"
+ENV LD_LIBRARY_PATH="/osxcross/lib"
 COPY rootfs /
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
