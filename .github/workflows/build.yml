@@ -15,135 +15,106 @@ on:
       - 'v*'
   pull_request:
 
-env:
-  DOCKERHUB_SLUG: crazymax/goxx
-  GHCR_SLUG: ghcr.io/crazy-max/goxx
-  PLATFORMS: linux/amd64,linux/arm64
-
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
       -
-        name: Cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        name: Create matrix
+        id: matrix
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          INPUT_GO-VERSIONS: |
+            1.25.0
+            1.25.1
+            1.25.2
+            1.25.3
+            1.25.4
+            1.25.5
+            1.25.6
+            1.25.7
+            1.25.8
+            1.25.9
+            1.25.10
+            1.26.0
+            1.26.1
+            1.26.2
+            1.26.3
         with:
-          path: /tmp/.goxx-cache
-          key: ${{ runner.os }}-goxx-base-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-goxx-base-
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
-      -
-        name: Build base (cache only)
-        uses: docker/bake-action@a66e1c87e2eca0503c343edf1d208c716d54b8a8 # v7.1.0
-        with:
-          targets: base
-          set: |
-            *.platform=${{ env.PLATFORMS }}
-            *.cache-from=type=gha,scope=base
-            *.cache-to=type=gha,scope=base,mode=max
+          script: |
+            const goVersions = core.getMultilineInput('go-versions');
+
+            const parseVersion = (goVersion) => {
+              const match = goVersion.match(/^(\d+)\.(\d+)\.(\d+)$/);
+              if (!match) {
+                throw new Error(`Invalid Go version: ${goVersion}`);
+              }
+              return {
+                goVersion,
+                major: Number(match[1]),
+                minor: Number(match[2]),
+                patch: Number(match[3]),
+                majorMinor: `${match[1]}.${match[2]}`,
+              };
+            };
+
+            const compareVersion = (a, b) => a.major - b.major || a.minor - b.minor || a.patch - b.patch;
+            const versions = goVersions.map(parseVersion).sort(compareVersion);
+            const latestCurrent = versions[versions.length - 1];
+            const releaseLines = [...new Set(versions.map((version) => version.majorMinor))];
+            const previousLine = releaseLines[releaseLines.length - 2];
+            const latestPrevious = versions.filter((version) => version.majorMinor === previousLine).pop();
+
+            const include = versions.map((version) => {
+              return {
+                go_version: version.goVersion,
+                major_minor: version.majorMinor,
+                latest_previous: version.goVersion === latestPrevious?.goVersion,
+                latest_current: version.goVersion === latestCurrent.goVersion,
+              };
+            });
+
+            core.info(JSON.stringify(include, null, 2));
+            core.setOutput('matrix', JSON.stringify({ include }));
 
   build:
-    needs: prepare
-    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    uses: docker/github-builder/.github/workflows/bake.yml@c2782c55efa56a01b9c30021db8f5ec3993228a3 # v1.8.0
     permissions:
-      contents: read # same as global permissions
+      contents: read # required to fetch the repository content
       packages: write # required to push to GHCR
-    env:
-      LATEST_CURRENT: 1.26.1
-      LATEST_PREVIOUS: 1.25.8
+      id-token: write # required to sign provenance attestations
     strategy:
       fail-fast: false
-      matrix:
-        go_version:
-          - 1.25.0
-          - 1.25.1
-          - 1.25.2
-          - 1.25.3
-          - 1.25.4
-          - 1.25.5
-          - 1.25.6
-          - 1.25.7
-          - 1.25.8
-          - 1.25.9
-          - 1.25.10
-          - 1.26.0
-          - 1.26.1
-          - 1.26.2
-          - 1.26.3
-    steps:
-      -
-        name: Remove dotnet
-        run: sudo rm -rf /usr/share/dotnet
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
-      -
-        name: Tags
-        id: tags
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        with:
-          result-encoding: string
-          script: |
-            const os = require('os');
-            const majorMinor = "${{ matrix.go_version }}".match(/[0-9]+\.[0-9]+/g)[0];
-            const tags = ["${{ matrix.go_version }}"];
-            switch ("${{ matrix.go_version }}") {
-              case "${{ env.LATEST_CURRENT }}": {
-                tags.push(majorMinor, "latest");
-                break;
-              }
-              case "${{ env.LATEST_PREVIOUS }}": {
-                tags.push(majorMinor);
-                break;
-              }
-            }
-            return tags.join(os.EOL);
-      -
-        name: Docker meta
-        id: meta
-        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
-        with:
-          images: |
-            ${{ env.DOCKERHUB_SLUG }}
-            ${{ env.GHCR_SLUG }}
-          tags: ${{ steps.tags.outputs.result }}
-          labels: |
-            org.opencontainers.image.title=goxx (go-${{ matrix.go_version }})
-            org.opencontainers.image.vendor=CrazyMax
-      -
-        name: Login to DockerHub
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    with:
+      output: image
+      push: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+      target: image-all
+      cache: true
+      cache-scope: go-${{ matrix.go_version }}
+      vars: |
+        GO_VERSION=${{ matrix.go_version }}
+      set-meta-labels: true
+      meta-images: |
+        crazymax/goxx
+        ghcr.io/crazy-max/goxx
+      meta-tags: |
+        type=raw,value=${{ matrix.go_version }}
+        type=raw,value=${{ matrix.major_minor }},enable=${{ matrix.latest_previous || matrix.latest_current }}
+        type=raw,value=latest,enable=${{ matrix.latest_current }}
+      meta-labels: |
+        org.opencontainers.image.title=goxx (go-${{ matrix.go_version }})
+        org.opencontainers.image.description=Go CGO cross-compiler
+        org.opencontainers.image.vendor=CrazyMax
+    secrets:
+      registry-auths: |
+        - registry: docker.io
+          username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      -
-        name: Login to GHCR
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
-        with:
-          registry: ghcr.io
+        - registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Build goxx
-        uses: docker/bake-action@a66e1c87e2eca0503c343edf1d208c716d54b8a8 # v7.1.0
-        with:
-          files: |
-            ./docker-bake.hcl
-            cwd://${{ steps.meta.outputs.bake-file }}
-          targets: image
-          set: |
-            *.platform=${{ env.PLATFORMS }}
-            *.args.GO_VERSION=${{ matrix.go_version }}
-            *.cache-from=type=gha,scope=base
-          push: ${{ startsWith(github.ref, 'refs/tags/v') }}
