@@ -170,8 +170,8 @@ jobs:
               latestPrevious
             } = await resolveGoVersions();
 
-            core.info(`Resolved Go versions from ${sourceUrl}: ${JSON.stringify(buildVersions, null, 2)}`);
-            core.info(`Latest current: ${latestCurrent} and ${latestPrevious} from ${sourceUrl}`);
+            core.info(`Resolved Go versions from ${sourceUrl}: ${JSON.stringify(buildVersions)}`);
+            core.info(`Latest current: ${latestCurrent}`);
             core.info(`Latest previous: ${latestPrevious}`);
 
             const changedFiles = [];
