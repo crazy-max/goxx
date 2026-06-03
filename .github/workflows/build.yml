@@ -38,10 +38,12 @@ jobs:
             1.25.8
             1.25.9
             1.25.10
+            1.25.11
             1.26.0
             1.26.1
             1.26.2
             1.26.3
+            1.26.4
         with:
           script: |
             const goVersions = core.getMultilineInput('go-versions');
