@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG UBUNTU_VERSION="24.04"
-ARG GO_VERSION="1.26.5"
+ARG GO_VERSION="1.26.6"
 
 FROM ubuntu:${UBUNTU_VERSION} AS base
 RUN export DEBIAN_FRONTEND="noninteractive" \
